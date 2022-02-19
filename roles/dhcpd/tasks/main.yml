@@ -1,0 +1,9 @@
+
+---
+- name: Configure network
+  include: configure_network.yml
+
+- name: Configure dhcpd server
+  include: configure_dhcpd.yml
+  tags:
+    - configure_dhcpd

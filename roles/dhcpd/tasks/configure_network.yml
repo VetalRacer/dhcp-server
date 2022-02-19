@@ -1,0 +1,48 @@
+---
+# Variable setup
+- name: Variables.
+  include_vars: network.yml
+
+- name: Remove default network configuration file
+  file:
+    path: /etc/netplan/00-installer-config.yaml
+    state: absent
+  become: yes
+
+- name: Create new network configuration file
+  template:
+    src: templates/netplan-static-ip.yaml.j2
+    dest: /etc/netplan/60-static-ip.yaml
+    mode: '644'
+  become: yes
+  with_items:
+    - '{{ network_config }}'
+  register: netplan_template
+
+- name: Apply new network configuration
+  shell: "(sleep 1;netplan apply) &"
+  async: 15
+  poll: 0
+  become: yes
+  when: netplan_template is changed
+
+- name: Use new static IP address
+  set_fact:
+    ansible_ssh_host: "{{ item.network.ip4 }}"
+  changed_when: ansible_ssh_host != item.network.ip4
+  when: netplan_template is changed
+  with_items:
+   - '{{ network_config }}'
+
+- meta: reset_connection
+
+- name: Ensure IP address is reachable
+  wait_for_connection:
+    connect_timeout: 3
+    timeout: 90
+
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: "{{ item.hostname.name }}"
+  with_items:
+   - '{{ network_config }}'

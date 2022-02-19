@@ -1,0 +1,38 @@
+---
+- name: Update apt packages
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+
+- name: Install dhcpd package
+  apt:
+    pkg:
+      - isc-dhcp-server
+    state: latest
+    update_cache: true
+
+- name: Add changes '/etc/default/isc-dhcp-server' in config dhcp file
+  lineinfile:
+    state: present
+    dest: /etc/default/isc-dhcp-server
+    backrefs: yes
+    regexp: '^.*{{ item }}.*$'
+    line: '{{ item }}="enp0s8"'
+    backup: yes
+  with_items:
+    - INTERFACESv4
+  notify:
+    - Reload isc-dhcp-server service
+
+- name: Add dhcpd configuration
+  template:
+    src: templates/dhcpd-conf.yaml.j2
+    dest: /etc/dhcp/dhcpd.conf
+    mode: '644'
+  become: yes
+  notify:
+    - Reload isc-dhcp-server service
+
+- name: Add to autostart dhcpd-server
+  service: name=isc-dhcp-server enabled=yes

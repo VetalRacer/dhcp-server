@@ -1,0 +1,17 @@
+network:
+  version: 2
+  ethernets:
+    {{ item.network.conn_name }}:
+      dhcp4: no
+      addresses:
+        - {{ item.network.ip4 }}/{{ item.network.netmask }}
+      gateway4: {{ item.network.gw4 }}
+      nameservers:
+          addresses: {{ item.network.nameservers }}
+    {{ item.dhcpd.conn_name }}:
+      dhcp4: no
+      addresses:
+        - {{ item.dhcpd.ip4 }}/{{ item.dhcpd.netmask }}
+      gateway4: {{ item.dhcpd.gw4 }}
+      nameservers:
+          addresses: {{ item.dhcpd.nameservers }}

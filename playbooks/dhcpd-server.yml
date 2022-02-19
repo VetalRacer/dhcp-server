@@ -1,0 +1,12 @@
+---
+- name: Configure dhcpd server
+  hosts: dhcpd_server
+  become: yes
+  roles:
+    - { role: ../roles/dhcpd }
+
+- name: Configure dhcp client
+  hosts: dhcp_client
+  become: yes
+  roles:
+    - { role: ../roles/client}

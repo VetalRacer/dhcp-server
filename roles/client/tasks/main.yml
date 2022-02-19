@@ -1,0 +1,10 @@
+---
+# Variable setup
+- name: Variables.
+  include_vars: hostname.yml
+
+- name: Set a hostname
+  ansible.builtin.hostname:
+    name: "{{ item.name }}"
+  with_items:
+   - '{{ hostname }}'

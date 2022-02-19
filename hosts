@@ -1,0 +1,5 @@
+[dhcpd_server]
+dhcpd_server ansible_host=192.168.1.14 ansible_user=test1 ansible_connection=ssh
+
+[dhcp_client]
+dhcp_client ansible_host=192.168.1.18 ansible_user=test2 ansible_connection=ssh
